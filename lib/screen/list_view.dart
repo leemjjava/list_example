@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:list_view_example/bloc/first_list_cubit.dart';
-import 'package:list_view_example/bloc/fourth_list_cubit.dart';
-import 'package:list_view_example/bloc/second_list_cubit.dart';
-import 'package:list_view_example/bloc/third_list_cubit.dart';
+import 'package:list_view_example/bloc/LIstNotifier.dart';
 
 // ignore: must_be_immutable
 class PageListView extends StatelessWidget {
@@ -14,13 +11,15 @@ class PageListView extends StatelessWidget {
 
   PageListView({
     required this.index,
+    required this.title,
     Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     this.context = context;
-    _watchCubit();
+    final listNotifier = context.watch<ListNotifier>();
+    list = listNotifier.list[index];
 
     return Container(
       color: const Color(0xffcfcfcf),
@@ -106,94 +105,20 @@ class PageListView extends StatelessWidget {
     );
   }
 
-  _watchCubit() {
-    switch (index) {
-      case 0:
-        list = context.watch<FirstListCubit>().list;
-        title = "A";
-        break;
-      case 1:
-        list = context.watch<SecondListCubit>().list;
-        title = "B";
-        break;
-      case 2:
-        list = context.watch<ThirdListCubit>().list;
-        title = "C";
-        break;
-      case 3:
-        list = context.watch<FourthListCubit>().list;
-        title = "D";
-        break;
-    }
-  }
-
   _addMyItem() {
-    final addTitle = "Item ${list.length + 1}";
-    switch (index) {
-      case 0:
-        context.read<FirstListCubit>().addItem(addTitle);
-        break;
-      case 1:
-        context.read<SecondListCubit>().addItem(addTitle);
-        break;
-      case 2:
-        context.read<ThirdListCubit>().addItem(addTitle);
-        break;
-      case 3:
-        context.read<FourthListCubit>().addItem(addTitle);
-        break;
-    }
+    final notifier = context.read<ListNotifier>();
+    notifier.addItemList(index);
   }
 
   _onLeftBtnTap(int itemIndex) {
-    switch (index) {
-      case 1:
-        context.read<SecondListCubit>().deleteItem(itemIndex);
-
-        final list = context.read<FirstListCubit>().list;
-        final addTitle = "Item ${list.length + 1}";
-        context.read<FirstListCubit>().addItem(addTitle);
-        break;
-      case 2:
-        context.read<ThirdListCubit>().deleteItem(itemIndex);
-
-        final list = context.read<SecondListCubit>().list;
-        final addTitle = "Item ${list.length + 1}";
-        context.read<SecondListCubit>().addItem(addTitle);
-        break;
-      case 3:
-        context.read<FourthListCubit>().deleteItem(itemIndex);
-
-        final list = context.read<ThirdListCubit>().list;
-        final addTitle = "Item ${list.length + 1}";
-        context.read<ThirdListCubit>().addItem(addTitle);
-        break;
-    }
+    final notifier = context.read<ListNotifier>();
+    notifier.removeItem(index, itemIndex);
+    notifier.addItemList(index - 1);
   }
 
   _onRightBtnTap(int itemIndex) {
-    switch (index) {
-      case 0:
-        context.read<FirstListCubit>().deleteItem(itemIndex);
-
-        final list = context.read<SecondListCubit>().list;
-        final addTitle = "Item ${list.length + 1}";
-        context.read<SecondListCubit>().addItem(addTitle);
-        break;
-      case 1:
-        context.read<SecondListCubit>().deleteItem(itemIndex);
-
-        final list = context.read<ThirdListCubit>().list;
-        final addTitle = "Item ${list.length + 1}";
-        context.read<ThirdListCubit>().addItem(addTitle);
-        break;
-      case 2:
-        context.read<ThirdListCubit>().deleteItem(itemIndex);
-
-        final list = context.read<FourthListCubit>().list;
-        final addTitle = "Item ${list.length + 1}";
-        context.read<FourthListCubit>().addItem(addTitle);
-        break;
-    }
+    final notifier = context.read<ListNotifier>();
+    notifier.removeItem(index, itemIndex);
+    notifier.addItemList(index + 1);
   }
 }
